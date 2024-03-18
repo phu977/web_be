@@ -13,7 +13,7 @@ import { keyApi } from "../config/jwt.js";
 
 const Action = express.Router();
 
-Action.post("/createAction", keyApi, createAction);
+Action.post("/createAction", createAction);
 Action.post("/inforaction", keyApi, getAction);
 Action.get("/all", keyApi, loadFullAction);
 Action.post("/search", keyApi, searchListAction);

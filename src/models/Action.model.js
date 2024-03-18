@@ -1,10 +1,12 @@
 import mongoose from "mongoose";
 const Schema = mongoose.Schema;
 const ActionSchema = Schema({
+  mParentTypeID: { type: Schema.Types.ObjectId, ref: "ParentType" },
   mTypeActionID: {
     type: Schema.Types.ObjectId,
     ref: "ActionType",
   },
+  mOrgUnitID: { type: Schema.Types.ObjectId, ref: "OrgUnit" },
   mNameAction: { type: String, require: true },
   mOwer: { type: String, require: true },
   mParticipant: { type: Number, require: true },

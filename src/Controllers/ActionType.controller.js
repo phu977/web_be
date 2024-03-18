@@ -8,18 +8,18 @@ function momentWithTz(day, tz) {
 
 const createActionType = async (req, res) => {
   try {
-    let { typeName, mLevel } = req.body;
-    if (!typeName || !mLevel) {
+    let { mParentTypeID, typeName } = req.body;
+    if (!typeName) {
       return res.status(400).send({
         statusCode: 404,
-        message: "typeName or mLevel is missing",
+        message: "typeName  is missing",
       });
     }
     let data = await ActionType.findOne({ typeName: req.body.typeName });
     if (!data) {
       let newActionType = {
+        mParentTypeID,
         typeName,
-        mLevel,
       };
       await ActionType.create(newActionType);
       return res.status(200).send({
@@ -45,10 +45,10 @@ const createActionType = async (req, res) => {
 const updateActionType = async (req, res) => {
   try {
     let { id } = req.params;
-    let { typeName, mLevel } = req.body;
+    let { mParentTypeID, typeName } = req.body;
     let updateData = {
+      mParentTypeID,
       typeName,
-      mLevel,
     };
 
     let updateActionType = await ActionType.findOneAndUpdate(

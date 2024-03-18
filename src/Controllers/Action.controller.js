@@ -1,5 +1,6 @@
 import Action from "../models/Action.model.js";
 import ActionType from "../models/ActionType.model.js";
+import ParentType from "../models/ParentType.model.js";
 import moment from "moment-timezone";
 import mongoose from "mongoose";
 
@@ -12,7 +13,9 @@ function momentWithTz(day, tz) {
 const createAction = async (req, res) => {
   try {
     let {
+      mParentTypeID,
       mTypeActionID,
+      mOrgUnitID,
       mNameAction,
       mOwer,
       mParticipant,
@@ -30,11 +33,12 @@ const createAction = async (req, res) => {
 
     // Kiểm tra xem mNameAction đã tồn tại hay chưa
     let existingAction = await Action.findOne({ mNameAction });
-
     if (!existingAction) {
       // Nếu mNameAction chưa tồn tại, tạo hành động mới
       let newAction = {
+        mParentTypeID,
         mTypeActionID,
+        mOrgUnitID,
         mNameAction,
         mOwer,
         mParticipant,
@@ -67,7 +71,9 @@ const updateAction = async (req, res) => {
   try {
     let { ActionID } = req.params;
     let {
+      mParentTypeID,
       mTypeActionID,
+      mOrgUnitID,
       mNameAction,
       mOwer,
       mParticipant,
@@ -76,7 +82,9 @@ const updateAction = async (req, res) => {
       mDescription,
     } = req.body;
     let updateData = {
+      mParentTypeID,
       mTypeActionID,
+      mOrgUnitID,
       mNameAction,
       mOwer,
       mParticipant,
