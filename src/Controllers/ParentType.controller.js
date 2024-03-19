@@ -37,4 +37,22 @@ const createParentType = async (req, res) => {
   }
 };
 
-export { createParentType };
+const getParentType = async (req, res) => {
+  try {
+    let data = await ParentType.find();
+    if (!data) {
+      return res
+        .status(400)
+        .send({ statusCode: 400, message: "Không có dữ liệu" });
+    }
+    return res
+      .status(200)
+      .send({ statusCode: 200, message: "", content: data });
+  } catch (error) {
+    res
+      .status(500)
+      .send({ statuscode: 500, message: "", message: error.message });
+  }
+};
+
+export { createParentType, getParentType };

@@ -1,5 +1,6 @@
 import express from "express";
 import {
+  actionOrgUnit,
   createAction,
   deleteAction,
   getAction,
@@ -21,5 +22,5 @@ Action.put("updateaction/:ActionID", keyApi, updateAction);
 Action.post("/render", keyApi, renderAction);
 Action.get("/list", keyApi, getListAction);
 Action.post("/delete", keyApi, deleteAction);
-
+Action.post("/actionUnit", actionOrgUnit);
 export default Action;
