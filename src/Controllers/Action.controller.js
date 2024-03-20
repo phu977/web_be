@@ -365,15 +365,83 @@ const deleteAction = async (req, res) => {
   }
 };
 
-// list action with mOrgUnit
+// list action with mOrgUnit, ParentType
 
 const actionOrgUnit = async (req, res) => {
   try {
     let { mOrgUnitID } = req.body;
+    if (mOrgUnitID == 1) {
+      let action = await Action.aggregate([
+        {
+          $project: {
+            _id: 1,
+            mNameAction: 1,
+            mOwer: 1,
+            mParticipant: 1,
+            mLat: 1,
+            mLong: 1,
+            mDescription: 1,
+          },
+        },
+      ]);
+      res.status(200).send({ statusCode: 200, message: "", content: action });
+    } else {
+      const actions = await Action.aggregate([
+        {
+          $match: {
+            mOrgUnitID: new mongoose.Types.ObjectId(mOrgUnitID), // Chuyển orgUnitId thành ObjectId để so sánh
+          },
+        },
+        {
+          $lookup: {
+            from: "ParentType", // Tên của collection ParentType
+            localField: "mParentTypeID",
+            foreignField: "_id",
+            as: "parentType",
+          },
+        },
+        {
+          $lookup: {
+            from: "ActionType", // Tên của collection ActionType
+            localField: "mTypeActionID",
+            foreignField: "_id",
+            as: "actionType",
+          },
+        },
+        {
+          $project: {
+            mNameAction: 1,
+            mOwer: 1,
+            mParticipant: 1,
+            mLat: 1,
+            mLong: 1,
+            mDescription: 1,
+            nameParentType: { $arrayElemAt: ["$parentType.nameParentType", 0] },
+            typeName: { $arrayElemAt: ["$actionType.typeName", 0] },
+          },
+        },
+      ]);
+      if (actions.length === 0) {
+        return res
+          .status(404)
+          .send({ statusCode: 404, message: "Không tìm thấy hoạt động" });
+      }
+      return res
+        .status(200)
+        .send({ statusCode: 200, message: "", content: actions });
+    }
+  } catch (error) {
+    res.status(500).send({ statusCode: 500, message: error.message });
+  }
+};
+
+const actionParentType = async (req, res) => {
+  try {
+    let { parentTypeID } = req.body;
     const actions = await Action.aggregate([
       {
         $match: {
-          mOrgUnitID: new mongoose.Types.ObjectId(mOrgUnitID), // Chuyển orgUnitId thành ObjectId để so sánh
+          mParentTypeID: new mongoose.Types.ObjectId(parentTypeID), // Chuyển parentTypeID thành parentTypeID để so sánh
         },
       },
       {
@@ -405,7 +473,6 @@ const actionOrgUnit = async (req, res) => {
         },
       },
     ]);
-
     if (actions.length === 0) {
       return res
         .status(404)
@@ -429,4 +496,5 @@ export {
   getListAction,
   deleteAction,
   actionOrgUnit,
+  actionParentType,
 };

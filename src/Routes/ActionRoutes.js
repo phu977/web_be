@@ -1,6 +1,7 @@
 import express from "express";
 import {
   actionOrgUnit,
+  actionParentType,
   createAction,
   deleteAction,
   getAction,
@@ -23,4 +24,5 @@ Action.post("/render", keyApi, renderAction);
 Action.get("/list", keyApi, getListAction);
 Action.post("/delete", keyApi, deleteAction);
 Action.post("/actionUnit", actionOrgUnit);
+Action.post("/actionParent", actionParentType);
 export default Action;
