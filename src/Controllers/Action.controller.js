@@ -22,6 +22,8 @@ const createAction = async (req, res) => {
       mLat,
       mLong,
       mDescription,
+      mStartDay,
+      mEndDay,
     } = req.body;
 
     if (!mNameAction || !mLat || !mLong) {
@@ -45,6 +47,8 @@ const createAction = async (req, res) => {
         mLat,
         mLong,
         mDescription,
+        mStartDay: new Date(mStartDay),
+        mEndDay: new Date(mEndDay),
       };
       await Action.create(newAction);
 
@@ -80,6 +84,8 @@ const updateAction = async (req, res) => {
       mLat,
       mLong,
       mDescription,
+      mStartDay,
+      mEndDay,
     } = req.body;
     let updateData = {
       mParentTypeID,
@@ -91,6 +97,8 @@ const updateAction = async (req, res) => {
       mLat,
       mLong,
       mDescription,
+      mStartDay: new Date(mStartDay),
+      mEndDay: new Date(mEndDay),
     };
     let updateAction = await Action.findOneAndUpdate(
       { _id: ActionID },
@@ -117,7 +125,18 @@ const getAction = async (req, res) => {
   try {
     let { id } = req.body;
     if (id == 1) {
-      let action = await Action.aggregate([
+      const action = await Action.aggregate([
+        {
+          $lookup: {
+            from: "ActionType",
+            localField: "mTypeActionID",
+            foreignField: "_id",
+            as: "type",
+          },
+        },
+        {
+          $unwind: "$type",
+        },
         {
           $project: {
             _id: 1,
@@ -127,6 +146,9 @@ const getAction = async (req, res) => {
             mLat: 1,
             mLong: 1,
             mDescription: 1,
+            mStartDay: 1,
+            mEndDay: 1,
+            typeName: "$type.typeName",
           },
         },
       ]);
@@ -141,9 +163,20 @@ const getAction = async (req, res) => {
       // Lấy danh sách các action tương ứng với mTypeActionID của ActionType
       const actions = await Action.aggregate([
         {
+          $lookup: {
+            from: "ActionType",
+            localField: "mTypeActionID",
+            foreignField: "_id",
+            as: "type",
+          },
+        },
+        {
           $match: {
             mTypeActionID: new mongoose.Types.ObjectId(actionType._id),
           },
+        },
+        {
+          $unwind: "$type",
         },
         {
           $project: {
@@ -154,6 +187,9 @@ const getAction = async (req, res) => {
             mLat: 1,
             mLong: 1,
             mDescription: 1,
+            mStartDay: 1,
+            mEndDay: 1,
+            typeName: "$type.typeName",
           },
         },
       ]);
@@ -165,7 +201,7 @@ const getAction = async (req, res) => {
   }
 };
 
-//get togethr action
+//get together action
 const loadFullAction = async (req, res) => {
   let action = await Action.aggregate([
     {
@@ -187,7 +223,7 @@ const loadFullAction = async (req, res) => {
   }
 };
 
-//API list searchAction with name,,typename
+//API list searchAction with name,typename
 const searchListAction = async (req, res) => {
   try {
     const { searchText } = req.body;
@@ -198,7 +234,6 @@ const searchListAction = async (req, res) => {
         message: "searchText is missing",
       });
     }
-
     const results = await Action.aggregate([
       // Tìm kiếm ActionType có typeName chứa searchText
       {
@@ -225,7 +260,6 @@ const searchListAction = async (req, res) => {
         },
       },
     ]);
-
     res.status(200).send({ statuscode: 200, message: "", content: results });
   } catch (error) {
     res.status(500).send({ statusCode: 500, message: error.message });
@@ -264,6 +298,8 @@ const renderAction = async (req, res) => {
             mLat: 1,
             mLong: 1,
             mDescription: 1,
+            mStartDay: 1,
+            mEndDay: 1,
             typeName: "$type.typeName",
           },
         },
@@ -299,6 +335,8 @@ const renderAction = async (req, res) => {
             mLat: 1,
             mLong: 1,
             mDescription: 1,
+            mStartDay: 1,
+            mEndDay: 1,
             typeName: "$type.typeName",
           },
         },
@@ -333,6 +371,8 @@ const getListAction = async (req, res) => {
           mOwer: 1,
           mParticipant: 1,
           mDescription: 1,
+          mStartDay: 1,
+          mEndDay: 1,
           typeName: "$actionType.typeName",
         },
       },
@@ -371,7 +411,18 @@ const actionOrgUnit = async (req, res) => {
   try {
     let { mOrgUnitID } = req.body;
     if (mOrgUnitID == 1) {
-      let action = await Action.aggregate([
+      const action = await Action.aggregate([
+        {
+          $lookup: {
+            from: "ActionType",
+            localField: "mTypeActionID",
+            foreignField: "_id",
+            as: "type",
+          },
+        },
+        {
+          $unwind: "$type",
+        },
         {
           $project: {
             _id: 1,
@@ -381,6 +432,9 @@ const actionOrgUnit = async (req, res) => {
             mLat: 1,
             mLong: 1,
             mDescription: 1,
+            mStartDay: 1,
+            mEndDay: 1,
+            typeName: "$type.typeName",
           },
         },
       ]);
@@ -416,6 +470,8 @@ const actionOrgUnit = async (req, res) => {
             mLat: 1,
             mLong: 1,
             mDescription: 1,
+            mStartDay: 1,
+            mEndDay: 1,
             nameParentType: { $arrayElemAt: ["$parentType.nameParentType", 0] },
             typeName: { $arrayElemAt: ["$actionType.typeName", 0] },
           },
@@ -468,6 +524,8 @@ const actionParentType = async (req, res) => {
           mLat: 1,
           mLong: 1,
           mDescription: 1,
+          mStartDay: 1,
+          mEndDay: 1,
           nameParentType: { $arrayElemAt: ["$parentType.nameParentType", 0] },
           typeName: { $arrayElemAt: ["$actionType.typeName", 0] },
         },

@@ -13,6 +13,14 @@ const ActionSchema = Schema({
   mLat: { type: Number, require: true },
   mLong: { type: Number, require: true },
   mDescription: { type: String },
+  mStartDay: {
+    type: Date,
+    require: true,
+  },
+  mEndDay: {
+    type: Date,
+    require: true,
+  },
 });
 
 let Action = mongoose.model("Action", ActionSchema, "Action");
