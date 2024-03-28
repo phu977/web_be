@@ -4,7 +4,9 @@ import {
   actionParentType,
   createAction,
   deleteAction,
+  editAndViewAction,
   getAction,
+  getActionPagination,
   getListAction,
   loadFullAction,
   renderAction,
@@ -25,4 +27,6 @@ Action.get("/list", keyApi, getListAction);
 Action.post("/delete", keyApi, deleteAction);
 Action.post("/actionUnit", actionOrgUnit);
 Action.post("/actionParent", actionParentType);
+Action.post("/ationPage", getActionPagination);
+Action.post("/detail", editAndViewAction);
 export default Action;

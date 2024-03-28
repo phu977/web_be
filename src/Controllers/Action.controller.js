@@ -120,6 +120,18 @@ const updateAction = async (req, res) => {
   }
 };
 
+const editAndViewAction = async (req, res) => {
+  try {
+    let { ActionID } = req.body;
+    const action = await Action.findById(ActionID);
+    return res
+      .status(200)
+      .send({ statusCode: 200, message: "", content: action });
+  } catch (error) {
+    res.status(500).send({ statusCode: 500, message: error.message });
+  }
+};
+
 //API list action
 const getAction = async (req, res) => {
   try {
@@ -544,6 +556,53 @@ const actionParentType = async (req, res) => {
   }
 };
 
+//action pagination
+const getActionPagination = async (req, res) => {
+  try {
+    const { page, limit } = req.body;
+    const pageNumber = parseInt(page) || 1;
+    const limitNumber = parseInt(limit) || 10;
+
+    const pipeline = [
+      {
+        $skip: (pageNumber - 1) * limitNumber,
+      },
+      {
+        $limit: limitNumber,
+      },
+      {
+        $lookup: {
+          from: "ActionType", // Tên của collection chứa ActionType
+          localField: "mTypeActionID",
+          foreignField: "_id",
+          as: "actionType",
+        },
+      },
+      {
+        $project: {
+          mNameAction: 1,
+          mOwer: 1,
+          mParticipant: 1,
+          mLat: 1,
+          mLong: 1,
+          mDescription: 1,
+          mStartDay: 1,
+          mEndDay: 1,
+          typeName: { $arrayElemAt: ["$actionType.typeName", 0] },
+        },
+      },
+    ];
+
+    const actions = await Action.aggregate(pipeline);
+
+    return res
+      .status(200)
+      .send({ statusCode: 200, message: "", content: actions });
+  } catch (error) {
+    res.status(500).send({ statusCode: 500, message: error.message });
+  }
+};
+
 export {
   createAction,
   getAction,
@@ -555,4 +614,7 @@ export {
   deleteAction,
   actionOrgUnit,
   actionParentType,
+  getActionPagination,
+  editAndViewAction,
 };
+//10.838689425406104, 106.66669708089262
